@@ -23,4 +23,6 @@
                 print(response!.status,response!.msg)
             }
         }
+
+        network.request(url: 你的url, paraments: 你的多个参数（字典）, head: http头的设置（字典）, httpMethod: http的请求方法, completion: <#T##(SimpleNetwork.ResponseResult, (Decodable & Encodable)?) -> ()#>)
   ```
