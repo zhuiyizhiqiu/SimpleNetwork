@@ -1,23 +1,23 @@
 import Foundation
 open class SimpleNetwork {
-    static let simpleNetwork = SimpleNetwork()
-    enum HttpMethod {
+    public static let simpleNetwork = SimpleNetwork()
+    public enum HttpMethod {
             case post
             case get
             case delete
         }
         
-        enum ResponseResult{
+       public enum ResponseResult{
             case failure(String)
             case success
         }
         
-        typealias Paraments = [String:String]
+        public typealias Paraments = [String:String]
         
-        typealias head = [String:String]
-        var timeOut:TimeInterval = 10
+        public typealias head = [String:String]
+        public var timeOut:TimeInterval = 10
         
-        func request<T:Codable>(url:String,paraments:Paraments? = nil,head:head? = nil,httpMethod: HttpMethod = .get,completion:@escaping(ResponseResult,T?) -> ()){
+        public func request<T:Codable>(url:String,paraments:Paraments? = nil,head:head? = nil,httpMethod: HttpMethod = .get,completion:@escaping(ResponseResult,T?) -> ()){
             guard let url = URL(string: url) else{
                 completion(.failure("url 解析错误"), nil)
                 return
