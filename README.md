@@ -8,7 +8,7 @@
   https://github.com/zhuiyizhiqiu/SimpleNetwork.git
 ```
 
-## 使用方法
+## 使用方法,直接用Codable协议进行解析数据
    ```
     let network = SimpleNetwork.simpleNetwork
      struct data: Codable {
@@ -25,7 +25,7 @@
         }
   ```
 
-## 解析json获取k-v
+## 直接获取k-v
   ```
           network.request(url: "https://www.sojson.com/api/qqmusic/8446666/json") { (result,dic) in
             switch result{
