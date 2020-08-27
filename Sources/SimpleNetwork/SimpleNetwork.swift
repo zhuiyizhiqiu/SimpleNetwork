@@ -1,4 +1,6 @@
 import Foundation
+import SwiftyJSON
+
 open class SimpleNetwork {
     public static let simpleNetwork = SimpleNetwork()
     
@@ -42,7 +44,7 @@ open class SimpleNetwork {
             
         }
     
-    public func request(url: String,paraments: Paraments? = nil,head:head? = nil,httpMethod: HttpMethod = .get,completion:@escaping(ResponseResult,[String: Any]?) -> ()){
+    public func request(url: String,paraments: Paraments? = nil,head:head? = nil,httpMethod: HttpMethod = .get,completion:@escaping(ResponseResult,JSON?) -> ()){
         guard let url = URL(string: url) else {
             completion(.failure("url 解析错误"),nil)
             return
@@ -107,7 +109,7 @@ extension SimpleNetwork{
         task.resume()
     }
     
-    private func dataTask(request: URLRequest,completion: @escaping(ResponseResult,[String:Any]?) -> ()){
+    private func dataTask(request: URLRequest,completion: @escaping(ResponseResult,JSON?) -> ()){
         let task = session.dataTask(with: request) { (data, response, error) in
             guard error == nil else{
                 completion(.failure(error!.localizedDescription),nil)
@@ -120,7 +122,7 @@ extension SimpleNetwork{
             }
             
             do{
-                let dic = try JSONSerialization.jsonObject(with: jsonData, options: .allowFragments) as! [String: Any]
+                let dic = try JSON(data:jsonData)
                 completion(.success,dic)
             }catch let error{
                 completion(.failure(error.localizedDescription),nil)
