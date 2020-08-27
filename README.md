@@ -24,3 +24,15 @@
             }
         }
   ```
+
+## 解析json获取k-v
+  ```
+          network.request(url: "https://www.sojson.com/api/qqmusic/8446666/json") { (result,dic) in
+            switch result{
+            case .failure(let error):
+                print(error)
+            case .success:
+                print(dic!)
+            }
+        }
+  ```
