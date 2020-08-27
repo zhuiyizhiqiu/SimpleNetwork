@@ -14,7 +14,7 @@ open class SimpleNetwork {
         }
         
        public enum ResponseResult{
-            case failure(String)
+            case failure(String?,Int?)
             case success
         }
         
@@ -25,7 +25,7 @@ open class SimpleNetwork {
         
         public func request<T:Codable>(url:String,paraments:Paraments? = nil,head:head? = nil,httpMethod: HttpMethod = .get,completion:@escaping(ResponseResult,T?) -> ()){
             guard let url = URL(string: url) else{
-                completion(.failure("url 解析错误"), nil)
+                completion(.failure("url 解析错误", nil), nil)
                 return
             }
             var request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: timeOut)
@@ -46,7 +46,7 @@ open class SimpleNetwork {
     
     public func request(url: String,paraments: Paraments? = nil,head:head? = nil,httpMethod: HttpMethod = .get,completion:@escaping(ResponseResult,JSON?) -> ()){
         guard let url = URL(string: url) else {
-            completion(.failure("url 解析错误"),nil)
+            completion(.failure("url 解析错误", nil),nil)
             return
         }
         
@@ -91,11 +91,11 @@ extension SimpleNetwork{
 
         let task = session.dataTask(with: request) { (data, response, error) in
             guard error == nil else{
-                completion(.failure(error!.localizedDescription), nil)
+                completion(.failure(error!.localizedDescription, nil), nil)
                 return
             }
             guard let httpRespose = response as? HTTPURLResponse,httpRespose.statusCode == 200,let jsonData = data else{
-                completion(.failure("网络错误"), nil)
+                completion(.failure("网络错误", (response as? HTTPURLResponse)?.statusCode), nil)
                 return
             }
             
@@ -103,7 +103,7 @@ extension SimpleNetwork{
                 let resourse = try JSONDecoder().decode(T.self, from: jsonData)
                 completion(.success, resourse)
             }catch let error{
-                completion(.failure(error.localizedDescription), nil)
+                completion(.failure(error.localizedDescription, nil), nil)
             }
         }
         task.resume()
@@ -112,12 +112,12 @@ extension SimpleNetwork{
     private func dataTask(request: URLRequest,completion: @escaping(ResponseResult,JSON?) -> ()){
         let task = session.dataTask(with: request) { (data, response, error) in
             guard error == nil else{
-                completion(.failure(error!.localizedDescription),nil)
+                completion(.failure(error!.localizedDescription, nil),nil)
                 return
             }
             
             guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200,let jsonData = data else{
-                completion(.failure("\(String(describing: (response as? HTTPURLResponse)?.statusCode))"),nil)
+                completion(.failure(nil,(response as? HTTPURLResponse)?.statusCode),nil)
                 return
             }
             
@@ -125,7 +125,7 @@ extension SimpleNetwork{
                 let dic = try JSON(data:jsonData)
                 completion(.success,dic)
             }catch let error{
-                completion(.failure(error.localizedDescription),nil)
+                completion(.failure(error.localizedDescription, nil),nil)
             }
         }
         task.resume()

@@ -22,7 +22,6 @@ let package = Package(
         .target(
             name: "SimpleNetwork",
             dependencies: [
-//            .product(name: "SwiftyJSON", package: "swiftyJSON"),
             .product(name: "SwiftyJSON", package: "SwiftyJSON"),
         ]),
         .testTarget(
