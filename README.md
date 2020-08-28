@@ -8,22 +8,6 @@
   https://github.com/zhuiyizhiqiu/SimpleNetwork.git
 ```
 
-## 使用方法,直接用Codable协议进行解析数据
-   ```
-    let network = SimpleNetwork.simpleNetwork
-     struct data: Codable {
-        var status = 0
-        var msg = ""
-    }
-    network.request(url: "要访问的url") { (result, response: data?) in
-            switch result{
-            case .failure(let str,_):
-                print(str)
-            case .success:
-                print(response!.status,response!.msg)
-            }
-        }
-  ```
 
 ## 直接获取k-v,就算url里面包含汉字字符也可以自动解析，无需其他任何操作
   ```
@@ -45,3 +29,21 @@
             }
         }
   ```
+  
+  ## 使用方法,直接用Codable协议进行解析数据
+   ```
+    let network = SimpleNetwork.simpleNetwork
+     struct data: Codable {
+        var status = 0
+        var msg = ""
+    }
+    network.request(url: "要访问的url") { (result, response: data?) in
+            switch result{
+            case .failure(let str,_):
+                print(str)
+            case .success:
+                print(response!.status,response!.msg)
+            }
+        }
+  ```
+
