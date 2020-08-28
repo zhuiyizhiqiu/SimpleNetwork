@@ -14,7 +14,7 @@ open class SimpleNetwork {
         }
         
        public enum ResponseResult{
-            case failure(String?,Int?)
+            case failure(String,Int?)
             case success
         }
         
@@ -117,7 +117,7 @@ extension SimpleNetwork{
             }
             
             guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200,let jsonData = data else{
-                completion(.failure(nil,(response as? HTTPURLResponse)?.statusCode),nil)
+                completion(.failure("网络错误",(response as? HTTPURLResponse)?.statusCode),nil)
                 return
             }
             

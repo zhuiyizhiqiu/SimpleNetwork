@@ -22,8 +22,8 @@ final class SimpleNetworkTests: XCTestCase {
         let head = ["userId":"341"]
         network.request(url: "http://192.168.110.194:9999/vehiclePublicInformation/getAllCompany", head: head){ (result, data:text?) in
         switch result{
-        case .failure(let str):
-            print(str)
+        case .failure(let error,_):
+            print(error)
         case .success:
             print(data!)
             XCTAssertEqual(data!.status, 20)
