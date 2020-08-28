@@ -10,8 +10,12 @@
 
 
 ## 直接获取k-v,就算url里面包含汉字字符也可以自动解析，无需其他任何操作
+  首先要引入框架
+    ```
+    import SimpleNetwork
+    ```
   ```
-          network.request(url: "https://www.sojson.com/api/qqmusic/8446666/json") { (result,dic) in
+          sn.request(url: "https://www.sojson.com/api/qqmusic/8446666/json") { (result,dic) in
             switch result{
             case .failure(let error,_):
                 print(error)
@@ -20,7 +24,7 @@
             }
         }
 
-        network.request(url: "http://api.qingyunke.com/api.php?key=free&appid=0&msg=北京天气") { (result,dic) in
+        sn.request(url: "http://api.qingyunke.com/api.php?key=free&appid=0&msg=北京天气") { (result,dic) in
             switch result{
             case .failure(let error,_):
                 print("error =",error)
@@ -32,12 +36,11 @@
   
   ## 使用方法,直接用Codable协议进行解析数据
    ```
-    let network = SimpleNetwork.simpleNetwork
      struct data: Codable {
         var status = 0
         var msg = ""
     }
-    network.request(url: "要访问的url") { (result, response: data?) in
+    sn.request(url: "要访问的url") { (result, response: data?) in
             switch result{
             case .failure(let str,_):
                 print(str)
