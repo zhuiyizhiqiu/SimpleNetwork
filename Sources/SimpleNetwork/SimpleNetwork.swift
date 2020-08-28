@@ -1,6 +1,7 @@
 import Foundation
 import SwiftyJSON
 
+public let sn = SimpleNetwork.simpleNetwork
 open class SimpleNetwork {
     public static let simpleNetwork = SimpleNetwork()
     
