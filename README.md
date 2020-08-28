@@ -11,9 +11,10 @@
 
 ## 直接获取k-v,就算url里面包含汉字字符也可以自动解析，无需其他任何操作
   首先要引入框架
-    ```
+
+  ```
     import SimpleNetwork
-    ```
+  ```
   ```
           sn.request(url: "https://www.sojson.com/api/qqmusic/8446666/json") { (result,dic) in
             switch result{
