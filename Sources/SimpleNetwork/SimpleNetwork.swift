@@ -24,8 +24,12 @@ open class SimpleNetwork {
         public var timeOut:TimeInterval = 10
         
         public func request<T:Codable>(url:String,paraments:Paraments? = nil,head:head? = nil,httpMethod: HttpMethod = .get,completion:@escaping(ResponseResult,T?) -> ()){
-            guard let url = URL(string: url) else{
-                completion(.failure("url 解析错误", nil), nil)
+            guard let newURL = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
+                completion(.failure("url编码错误", nil),nil)
+                return
+            }
+            guard let url = URL(string: newURL) else{
+                completion(.failure("\(newURL.removingPercentEncoding!)是非法的url", nil), nil)
                 return
             }
             var request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: timeOut)
@@ -45,11 +49,15 @@ open class SimpleNetwork {
         }
     
     public func request(url: String,paraments: Paraments? = nil,head:head? = nil,httpMethod: HttpMethod = .get,completion:@escaping(ResponseResult,JSON?) -> ()){
-        guard let url = URL(string: url) else {
-            completion(.failure("url 解析错误", nil),nil)
+        guard let newURL = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
+            completion(.failure("url编码错误", nil),nil)
             return
         }
-        
+        guard let url = URL(string: newURL) else{
+            completion(.failure("\(newURL.removingPercentEncoding!)是非法的url", nil), nil)
+            return
+        }
+
         var request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: timeOut)
         if head != nil{
             headParaments(request: &request, paramments: head!)
