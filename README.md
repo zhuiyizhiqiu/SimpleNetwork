@@ -9,7 +9,7 @@
 ```
 
 
-## 直接获取k-v,就算url里面包含汉字字符也可以自动解析，无需其他任何操作
+## 直接获取k-v,就算url里面包含汉字字符也可以自动解析，无需其他任何操作，默认是get请求
   首先要引入框架
 
   ```
@@ -50,4 +50,51 @@
             }
         }
   ```
+## 带有请求头的使用方法
+   ```
+           let head = [
+            "token" : "eyJhbGciOiJIUzI1NiJ9.eyJjcmVhdGVUaW1lIjoxNTk4NTkyOTgxNTY0LCJ0b2tlblZlcnNpb24iOjYsInBvd2VyIjoxMCwidXNlcklkIjoyfQ.v7j7K4PNwLyTpwUcc_UmGYdrUTU16il_orECivCzWR4"
+        ]
+        sn.request(url: "http://www.youapi.com",head: head) { (result, dic) in
+            switch result{
+            case .failure(let error, _):
+                print("error =",error)
+            case .success:
+                print(dic!)
+            }
+        }
+   ```
+   
+## 多参数请求的使用方法
+   ```
+       let paraments = [
+        "user" : "youname",
+        "pasword": "12345"
+    ]
+    sn.request(url: "http://www.youapi.com",paraments: paraments,httpMethod: .post) { (result, dic) in
+        switch result{
+        case .failure(let error, _):
+            print("error =",error)
+        case .success:
+            print(dic!)
+        }
+    }
+   ```
+
+## 发送照片的请求方法
+   ```
+    let image = UIImage(named: "yourImageName")
+    let imagesString = image!.jpegData(compressionQuality: 0.1)!.base64EncodedString()
+    let paraments = [
+        "image" : imagesString
+    ]
+    sn.request(url: "http://www.youapi.com",paraments: paraments,httpMethod: .post) { (result, dic) in
+        switch result{
+        case .failure(let error, _):
+            print("error =",error)
+        case .success:
+            print(dic!)
+        }
+    }
+   ```
 
