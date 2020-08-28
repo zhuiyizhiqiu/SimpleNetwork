@@ -52,9 +52,9 @@
   ```
 ## 带有请求头的使用方法
    ```
-           let head = [
+        let head = [
             "token" : "eyJhbGciOiJIUzI1NiJ9.eyJjcmVhdGVUaW1lIjoxNTk4NTkyOTgxNTY0LCJ0b2tlblZlcnNpb24iOjYsInBvd2VyIjoxMCwidXNlcklkIjoyfQ.v7j7K4PNwLyTpwUcc_UmGYdrUTU16il_orECivCzWR4"
-        ]
+          ]
         sn.request(url: "http://www.youapi.com",head: head) { (result, dic) in
             switch result{
             case .failure(let error, _):
@@ -68,9 +68,9 @@
 ## 多参数请求的使用方法
    ```
     let paraments = [
-     "user" : "youname",
-     "pasword": "12345"
-    ]
+       "user" : "youname",
+       "pasword": "12345"
+      ]
     sn.request(url: "http://www.youapi.com",paraments: paraments,httpMethod: .post) { (result, dic) in
         switch result{
         case .failure(let error, _):
