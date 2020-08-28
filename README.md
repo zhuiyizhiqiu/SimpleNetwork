@@ -67,9 +67,9 @@
    
 ## 多参数请求的使用方法
    ```
-       let paraments = [
-        "user" : "youname",
-        "pasword": "12345"
+    let paraments = [
+     "user" : "youname",
+     "pasword": "12345"
     ]
     sn.request(url: "http://www.youapi.com",paraments: paraments,httpMethod: .post) { (result, dic) in
         switch result{
