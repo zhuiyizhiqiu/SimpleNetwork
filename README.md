@@ -8,7 +8,29 @@
   https://github.com/zhuiyizhiqiu/SimpleNetwork.git
 ```
 
-## 使用方法,直接用Codable协议进行解析数据
+
+## 直接获取k-v,就算url里面包含汉字字符也可以自动解析，无需其他任何操作
+  ```
+          network.request(url: "https://www.sojson.com/api/qqmusic/8446666/json") { (result,dic) in
+            switch result{
+            case .failure(let error,_):
+                print(error)
+            case .success:
+                print(dic!)
+            }
+        }
+
+        network.request(url: "http://api.qingyunke.com/api.php?key=free&appid=0&msg=北京天气") { (result,dic) in
+            switch result{
+            case .failure(let error,_):
+                print("error =",error)
+            case .success:
+                print("返回键值对",dic!)
+            }
+        }
+  ```
+  
+  ## 使用方法,直接用Codable协议进行解析数据
    ```
     let network = SimpleNetwork.simpleNetwork
      struct data: Codable {
@@ -17,7 +39,7 @@
     }
     network.request(url: "要访问的url") { (result, response: data?) in
             switch result{
-            case .failure(let str):
+            case .failure(let str,_):
                 print(str)
             case .success:
                 print(response!.status,response!.msg)
@@ -25,14 +47,3 @@
         }
   ```
 
-## 直接获取k-v
-  ```
-          network.request(url: "https://www.sojson.com/api/qqmusic/8446666/json") { (result,dic) in
-            switch result{
-            case .failure(let error):
-                print(error)
-            case .success:
-                print(dic!)
-            }
-        }
-  ```
