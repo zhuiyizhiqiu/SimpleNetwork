@@ -12,6 +12,7 @@ open class SimpleNetwork {
             case post
             case get
             case delete
+            case put
         }
         
        public enum ResponseResult{
@@ -84,6 +85,8 @@ open class SimpleNetwork {
                    return "GET"
                case .delete:
                   return "DELETE"
+                case .put:
+            return "PUT"
                }
     }
     
