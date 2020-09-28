@@ -34,6 +34,7 @@ open class SimpleNetwork {
                 return
             }
             var request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: timeOut)
+            request.httpMethod = HTTPMethod(httpRequest: httpMethod)
             if head != nil{
                 headParaments(request: &request, paramments: head!)
             }
@@ -60,6 +61,7 @@ open class SimpleNetwork {
         }
 
         var request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: timeOut)
+        request.httpMethod = HTTPMethod(httpRequest: httpMethod)
         if head != nil{
             headParaments(request: &request, paramments: head!)
         }
@@ -72,6 +74,17 @@ open class SimpleNetwork {
         }
         
         dataTask(request: request, completion: completion)
+    }
+    
+    private func HTTPMethod(httpRequest: HttpMethod) -> String{
+        switch httpRequest {
+               case .post:
+                   return "POST"
+               case .get:
+                   return "GET"
+               case .delete:
+                  return "DELETE"
+               }
     }
 
 }
@@ -139,6 +152,8 @@ extension SimpleNetwork{
         }
         task.resume()
     }
+    
+    
 
 }
 
