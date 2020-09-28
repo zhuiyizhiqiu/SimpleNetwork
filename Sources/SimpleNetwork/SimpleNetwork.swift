@@ -86,6 +86,50 @@ open class SimpleNetwork {
                   return "DELETE"
                }
     }
+    
+    public func request<N:Codable>(url: String,paraments:N,head:head? = nil,httpMethod: HttpMethod = .get,completion:@escaping(ResponseResult,JSON?) -> ()){
+        guard let newURL = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
+            completion(.failure("url编码错误", nil),nil)
+            return
+        }
+        guard let url = URL(string: newURL) else{
+            completion(.failure("\(newURL.removingPercentEncoding!)是非法的url", nil), nil)
+            return
+        }
+        var request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: timeOut)
+        request.httpMethod = HTTPMethod(httpRequest: httpMethod)
+        do {
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.httpBody = try JSONEncoder().encode(paraments)
+            dataTask(request: request, completion: completion)
+        } catch  {
+            print(error.localizedDescription)
+            completion(.failure(error.localizedDescription, nil), nil)
+        }
+        
+    }
+    
+    public func request<N:Codable,T:Codable>(url: String,paraments:N,head:head? = nil,httpMethod: HttpMethod = .get,completion:@escaping(ResponseResult,T?) -> ()){
+        guard let newURL = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
+            completion(.failure("url编码错误", nil),nil)
+            return
+        }
+        guard let url = URL(string: newURL) else{
+            completion(.failure("\(newURL.removingPercentEncoding!)是非法的url", nil), nil)
+            return
+        }
+        var request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: timeOut)
+        request.httpMethod = HTTPMethod(httpRequest: httpMethod)
+        do {
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.httpBody = try JSONEncoder().encode(paraments)
+            dataTask(request: request, completion: completion)
+        } catch  {
+            print(error.localizedDescription)
+            completion(.failure(error.localizedDescription, nil), nil)
+        }
+
+    }
 
 }
 
