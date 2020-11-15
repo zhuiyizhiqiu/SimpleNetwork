@@ -27,7 +27,7 @@ open class SimpleNetwork {
     public var timeOut:TimeInterval = 10
 
     public func request<T:Codable>(url:String,paraments:Paraments? = nil,head:head? = nil,httpMethod: HttpMethod = .get,completion:@escaping(ResponseResult,T?) -> ()){
-        let url = makeURL(url: url, completion: completion)
+        guard let url = makeURL(url: url, completion: completion) else{ return }
         var request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: timeOut)
         request.httpMethod = HTTPMethod(httpRequest: httpMethod)
         if head != nil{
@@ -45,7 +45,7 @@ open class SimpleNetwork {
     }
     
     public func request(url: String,paraments: Paraments? = nil,head:head? = nil,httpMethod: HttpMethod = .get,completion:@escaping(ResponseResult,JSON?) -> ()){
-       let url = makeURL(url: url, completion: completion)
+        guard let url = makeURL(url: url, completion: completion) else{ return }
 
         var request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: timeOut)
         request.httpMethod = HTTPMethod(httpRequest: httpMethod)
@@ -65,7 +65,7 @@ open class SimpleNetwork {
     
     
     public func request<N:Codable>(url: String,paraments:N,head:head? = nil,httpMethod: HttpMethod = .get,completion:@escaping(ResponseResult,JSON?) -> ()){
-        let url = makeURL(url: url, completion: completion)
+        guard let url = makeURL(url: url, completion: completion) else{ return }
         var request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: timeOut)
         request.httpMethod = HTTPMethod(httpRequest: httpMethod)
         
@@ -84,7 +84,7 @@ open class SimpleNetwork {
     }
     
     public func request<N:Codable,T:Codable>(url: String,paraments:N,head:head? = nil,httpMethod: HttpMethod = .get,completion:@escaping(ResponseResult,T?) -> ()){
-        let url = makeURL(url: url, completion: completion)
+        guard let url = makeURL(url: url, completion: completion) else{ return }
         var request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: timeOut)
         request.httpMethod = HTTPMethod(httpRequest: httpMethod)
         if head != nil{
@@ -105,18 +105,31 @@ open class SimpleNetwork {
 
 extension SimpleNetwork{
     
-    private func makeURL<T:Codable>(url: String,completion:@escaping(ResponseResult,T)) -> URL{
+    private func makeURL<T:Codable>(url: String,completion:@escaping(ResponseResult,T?) -> ()) -> URL?{
            guard let newURL = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
                completion(.failure("url编码错误", nil),nil)
-               return
+               return nil
            }
            guard let url = URL(string: newURL) else{
                completion(.failure("\(newURL.removingPercentEncoding!)是非法的url", nil), nil)
-               return
+               return nil
            }
            
            return url
        }
+    
+    private func makeURL(url: String,completion:@escaping(ResponseResult,JSON?) -> ()) -> URL?{
+        guard let newURL = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
+            completion(.failure("url编码错误", nil),nil)
+            return nil
+        }
+        guard let url = URL(string: newURL) else{
+            completion(.failure("\(newURL.removingPercentEncoding!)是非法的url", nil), nil)
+            return nil
+        }
+        
+        return url
+    }
     
     private func HTTPMethod(httpRequest: HttpMethod) -> String{
         switch httpRequest {
