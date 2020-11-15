@@ -2,6 +2,7 @@ import Foundation
 import SwiftyJSON
 
 public let sn = SimpleNetwork.simpleNetwork
+
 open class SimpleNetwork {
     public static let simpleNetwork = SimpleNetwork()
     
@@ -15,51 +16,36 @@ open class SimpleNetwork {
             case put
         }
         
-       public enum ResponseResult{
-            case failure(String,Int?)
-            case success
+   public enum ResponseResult{
+        case failure(String,Int?)
+        case success
+    }
+    
+    public typealias Paraments = [String:String]
+    
+    public typealias head = [String:String]
+    public var timeOut:TimeInterval = 10
+
+    public func request<T:Codable>(url:String,paraments:Paraments? = nil,head:head? = nil,httpMethod: HttpMethod = .get,completion:@escaping(ResponseResult,T?) -> ()){
+        let url = makeURL(url: url, completion: completion)
+        var request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: timeOut)
+        request.httpMethod = HTTPMethod(httpRequest: httpMethod)
+        if head != nil{
+            headParaments(request: &request, paramments: head!)
+        }
+        if paraments != nil{
+            let boundary = "Boundary-\(UUID().uuidString)"
+            request.setValue("multipart/form-data; boundary=\(boundary)",
+            forHTTPHeaderField: "Content-Type")
+            request.httpBody = try! createBody(with: paraments!, boundary: boundary)
         }
         
-        public typealias Paraments = [String:String]
+        dataTask(request: request, completion: completion)
         
-        public typealias head = [String:String]
-        public var timeOut:TimeInterval = 10
-        
-        public func request<T:Codable>(url:String,paraments:Paraments? = nil,head:head? = nil,httpMethod: HttpMethod = .get,completion:@escaping(ResponseResult,T?) -> ()){
-            guard let newURL = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
-                completion(.failure("url编码错误", nil),nil)
-                return
-            }
-            guard let url = URL(string: newURL) else{
-                completion(.failure("\(newURL.removingPercentEncoding!)是非法的url", nil), nil)
-                return
-            }
-            var request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: timeOut)
-            request.httpMethod = HTTPMethod(httpRequest: httpMethod)
-            if head != nil{
-                headParaments(request: &request, paramments: head!)
-            }
-            
-            if paraments != nil{
-                let boundary = "Boundary-\(UUID().uuidString)"
-                request.setValue("multipart/form-data; boundary=\(boundary)",
-                forHTTPHeaderField: "Content-Type")
-                request.httpBody = try! createBody(with: paraments!, boundary: boundary)
-            }
-            
-            dataTask(request: request, completion: completion)
-            
-        }
+    }
     
     public func request(url: String,paraments: Paraments? = nil,head:head? = nil,httpMethod: HttpMethod = .get,completion:@escaping(ResponseResult,JSON?) -> ()){
-        guard let newURL = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
-            completion(.failure("url编码错误", nil),nil)
-            return
-        }
-        guard let url = URL(string: newURL) else{
-            completion(.failure("\(newURL.removingPercentEncoding!)是非法的url", nil), nil)
-            return
-        }
+       let url = makeURL(url: url, completion: completion)
 
         var request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: timeOut)
         request.httpMethod = HTTPMethod(httpRequest: httpMethod)
@@ -77,30 +63,15 @@ open class SimpleNetwork {
         dataTask(request: request, completion: completion)
     }
     
-    private func HTTPMethod(httpRequest: HttpMethod) -> String{
-        switch httpRequest {
-               case .post:
-                   return "POST"
-               case .get:
-                   return "GET"
-               case .delete:
-                  return "DELETE"
-                case .put:
-            return "PUT"
-               }
-    }
     
     public func request<N:Codable>(url: String,paraments:N,head:head? = nil,httpMethod: HttpMethod = .get,completion:@escaping(ResponseResult,JSON?) -> ()){
-        guard let newURL = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
-            completion(.failure("url编码错误", nil),nil)
-            return
-        }
-        guard let url = URL(string: newURL) else{
-            completion(.failure("\(newURL.removingPercentEncoding!)是非法的url", nil), nil)
-            return
-        }
+        let url = makeURL(url: url, completion: completion)
         var request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: timeOut)
         request.httpMethod = HTTPMethod(httpRequest: httpMethod)
+        
+        if head != nil{
+            headParaments(request: &request, paramments: head!)
+        }
         do {
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")
             request.httpBody = try JSONEncoder().encode(paraments)
@@ -113,16 +84,12 @@ open class SimpleNetwork {
     }
     
     public func request<N:Codable,T:Codable>(url: String,paraments:N,head:head? = nil,httpMethod: HttpMethod = .get,completion:@escaping(ResponseResult,T?) -> ()){
-        guard let newURL = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
-            completion(.failure("url编码错误", nil),nil)
-            return
-        }
-        guard let url = URL(string: newURL) else{
-            completion(.failure("\(newURL.removingPercentEncoding!)是非法的url", nil), nil)
-            return
-        }
+        let url = makeURL(url: url, completion: completion)
         var request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: timeOut)
         request.httpMethod = HTTPMethod(httpRequest: httpMethod)
+        if head != nil{
+            headParaments(request: &request, paramments: head!)
+        }
         do {
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")
             request.httpBody = try JSONEncoder().encode(paraments)
@@ -137,6 +104,33 @@ open class SimpleNetwork {
 }
 
 extension SimpleNetwork{
+    
+    private func makeURL<T:Codable>(url: String,completion:@escaping(ResponseResult,T)) -> URL{
+           guard let newURL = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
+               completion(.failure("url编码错误", nil),nil)
+               return
+           }
+           guard let url = URL(string: newURL) else{
+               completion(.failure("\(newURL.removingPercentEncoding!)是非法的url", nil), nil)
+               return
+           }
+           
+           return url
+       }
+    
+    private func HTTPMethod(httpRequest: HttpMethod) -> String{
+        switch httpRequest {
+               case .post:
+                   return "POST"
+               case .get:
+                   return "GET"
+               case .delete:
+                  return "DELETE"
+                case .put:
+                  return "PUT"
+           }
+    }
+    
     private func headParaments(request: inout URLRequest,paramments: head!){
         for i in paramments!{
             request.addValue(i.value, forHTTPHeaderField: i.key)
