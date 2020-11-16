@@ -8,6 +8,9 @@ open class SimpleNetwork {
     
     static let conf = URLSessionConfiguration.default
     let session = URLSession(configuration: conf)
+//    typealias T = Codable
+    public typealias completion<T:Codable> =  (ResponseResult,T?) -> ()
+//    typealias completion = (ResponseResult,JSON?) -> ()
     
     public enum HttpMethod {
             case post
@@ -26,7 +29,7 @@ open class SimpleNetwork {
     public typealias head = [String:String]
     public var timeOut:TimeInterval = 10
 
-    public func request<T:Codable>(url:String,paraments:Paraments? = nil,head:head? = nil,httpMethod: HttpMethod = .get,completion:@escaping(ResponseResult,T?) -> ()){
+    public func request<T:Codable>(url:String,paraments:Paraments? = nil,head:head? = nil,httpMethod: HttpMethod = .get,completion:@escaping completion<T>){
         guard let url = makeURL(url: url, completion: completion) else{ return }
         var request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: timeOut)
         request.httpMethod = HTTPMethod(httpRequest: httpMethod)
@@ -83,7 +86,7 @@ open class SimpleNetwork {
         
     }
     
-    public func request<N:Codable,T:Codable>(url: String,paraments:N,head:head? = nil,httpMethod: HttpMethod = .get,completion:@escaping(ResponseResult,T?) -> ()){
+    public func request<N:Codable,T:Codable>(url: String,paraments:N,head:head? = nil,httpMethod: HttpMethod = .get,completion:@escaping completion<T>){
         guard let url = makeURL(url: url, completion: completion) else{ return }
         var request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: timeOut)
         request.httpMethod = HTTPMethod(httpRequest: httpMethod)
@@ -163,7 +166,7 @@ extension SimpleNetwork{
         return body
     }
     
-    private func dataTask<T:Codable>(request:URLRequest,completion:@escaping(ResponseResult,T?) -> ()){
+    private func dataTask<T:Codable>(request:URLRequest,completion:@escaping completion<T>){
 
         let task = session.dataTask(with: request) { (data, response, error) in
             guard error == nil else{
