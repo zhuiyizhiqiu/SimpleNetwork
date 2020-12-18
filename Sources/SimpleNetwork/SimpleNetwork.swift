@@ -29,6 +29,14 @@ open class SimpleNetwork {
     public typealias head = [String:String]
     public var timeOut:TimeInterval = 10
 
+    
+    /// 发送网络请求，默认10s请求超时
+    /// - Parameters:
+    ///   - url: 传入一个字符串
+    ///   - paraments: 字符串字典类型的参数，不传默认为nil
+    ///   - head: 请求头里面包含的参数，字符串字典
+    ///   - httpMethod: http的请求方法，enum类型，包括put，delete，post，get，不传参数，默认为get
+    ///   - completion: 请求完之后返回的结果，completion包含两个返回的参数，一个是enum：包含了两种状态，分别是failure和success，failure的情况下，用enum的成员变量进行值绑定，分别绑定error处理和status的http状态码，success的情况下，则直接获取到遵循传入的对应模型的解析
     public func request<T:Codable>(url:String,paraments:Paraments? = nil,head:head? = nil,httpMethod: HttpMethod = .get,completion:@escaping completion<T>){
         guard let url = makeURL(url: url, completion: completion) else{ return }
         var request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: timeOut)
@@ -47,6 +55,13 @@ open class SimpleNetwork {
         
     }
     
+    /// 发送网络请求，默认10秒请求超时
+    /// - Parameters:
+    ///   - url: 传入一个字符串
+    ///   - paraments: 请求体，字符串字典类型的参数，不传默认为nil
+    ///   - head: 请求头里面包含的参数，字符串字典
+    ///   - httpMethod: http的请求方法，enum类型，包括put，delete，post，get，不传参数，默认为get
+    ///   - completion: 请求完之后返回的结果，completion包含两个返回的参数，一个是enum：包含了两种状态，分别是failure和success，failure的情况下，用enum的成员变量进行值绑定，分别绑定error处理和status的http状态码，success的情况下，则直接返回可选的json数据结构
     public func request(url: String,paraments: Paraments? = nil,head:head? = nil,httpMethod: HttpMethod = .get,completion:@escaping(ResponseResult,JSON?) -> ()){
         guard let url = makeURL(url: url, completion: completion) else{ return }
 
@@ -67,6 +82,14 @@ open class SimpleNetwork {
     }
     
     
+    /// 发送网络请求，默认10s请求超时
+    /// - Parameters:
+    ///   - url: 传入一个字符串
+    ///   - paraments: 请求体，传入遵循Codable协议的struct即可
+    ///   - head: 请求头里面包含的参数，字符串字典
+    ///   - httpMethod: http的请求方法，enum类型，包括put，delete，post，get，不传参数，默认为get
+    ///   - completion: 请求完之后返回的结果，completion包含两个返回的参数，一个是enum：包含了两种状态，分别是failure和success，failure的情况下，用enum的成员变量进行值绑定，分别绑定error处理和status的http状态码，success的情况下，则直接返回可选的json数据结构
+    /// - Returns: <#description#>
     public func request<N:Codable>(url: String,paraments:N,head:head? = nil,httpMethod: HttpMethod = .get,completion:@escaping(ResponseResult,JSON?) -> ()){
         guard let url = makeURL(url: url, completion: completion) else{ return }
         var request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: timeOut)
@@ -86,6 +109,14 @@ open class SimpleNetwork {
         
     }
     
+    /// 发送网络请求，默认10s请求超时
+    /// - Parameters:
+    ///   - url: 传入一个字符串
+    ///   - paraments: 请求体，传入遵循Codable协议的struct即可
+    ///   - head: 请求头里面包含的参数，字符串字典
+    ///   - httpMethod: http的请求方法，enum类型，包括put，delete，post，get，不传参数，默认为get
+    ///   - completion: 请求完之后返回的结果，completion包含两个返回的参数，一个是enum：包含了两种状态，分别是failure和success，failure的情况下，用enum的成员变量进行值绑定，分别绑定error处理和status的http状态码，success的情况下，则直接获取到遵循传入的对应模型的解析
+    /// - Returns: <#description#>
     public func request<N:Codable,T:Codable>(url: String,paraments:N,head:head? = nil,httpMethod: HttpMethod = .get,completion:@escaping completion<T>){
         guard let url = makeURL(url: url, completion: completion) else{ return }
         var request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: timeOut)
