@@ -1,5 +1,6 @@
 import Foundation
 import SwiftyJSON
+import  CoreServices
 
 public let sn = SimpleNetwork.simpleNetwork
 
