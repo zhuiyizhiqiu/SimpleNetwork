@@ -25,6 +25,7 @@ open class SimpleNetwork {
     }
     
     public typealias Paraments = [String:String]
+    public typealias FileParaments = [String:String]
     
     public typealias head = [String:String]
     public var timeOut:TimeInterval = 10
@@ -54,6 +55,65 @@ open class SimpleNetwork {
         dataTask(request: request, completion: completion)
         
     }
+    
+    public func request<T:Codable>(url:String,paraments:Paraments? = nil,fileParaments:FileParaments? = nil,head:head? = nil,httpMethod: HttpMethod = .get,completion:@escaping completion<T>){
+        guard let url = makeURL(url: url, completion: completion) else{ return }
+        var request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: timeOut)
+        request.httpMethod = HTTPMethod(httpRequest: httpMethod)
+        if head != nil{
+            headParaments(request: &request, paramments: head!)
+        }
+        if paraments != nil{
+            let boundary = "Boundary-\(UUID().uuidString)"
+            request.setValue("multipart/form-data; boundary=\(boundary)",
+            forHTTPHeaderField: "Content-Type")
+            if fileParaments != nil{
+                var files = [(name:"",path:"")]
+                files.removeAll()
+                for i in fileParaments!{
+                    let file = (name:i.key,path:i.value)
+                    files.append(file)
+                }
+                request.httpBody = try! createBody(with: paraments!,files: files, boundary: boundary)
+            }else{
+                request.httpBody = try! createBody(with: paraments!, boundary: boundary)
+            }
+        }
+        
+        dataTask(request: request, completion: completion)
+        
+    }
+    
+    public func request(url: String,paraments: Paraments? = nil,fileParaments:FileParaments? = nil,head:head? = nil,httpMethod: HttpMethod = .get,completion:@escaping(ResponseResult,JSON?) -> ()){
+        guard let url = makeURL(url: url, completion: completion) else{ return }
+
+        var request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: timeOut)
+        request.httpMethod = HTTPMethod(httpRequest: httpMethod)
+        if head != nil{
+            headParaments(request: &request, paramments: head!)
+        }
+        
+        if paraments != nil{
+            let boundary = "Boundary-\(UUID().uuidString)"
+            request.setValue("multipart/form-data; boundary=\(boundary)",
+            forHTTPHeaderField: "Content-Type")
+            if fileParaments != nil{
+                var files = [(name:"",path:"")]
+                files.removeAll()
+                for i in fileParaments!{
+                    let file = (name:i.key,path:i.value)
+                    files.append(file)
+                }
+                request.httpBody = try! createBody(with: paraments!,files: files, boundary: boundary)
+            }else{
+                request.httpBody = try! createBody(with: paraments!, boundary: boundary)
+            }
+            
+        }
+        
+        dataTask(request: request, completion: completion)
+    }
+    
     
     /// 发送网络请求，默认10秒请求超时
     /// - Parameters:
@@ -195,6 +255,56 @@ extension SimpleNetwork{
         }
         body.append("--\(boundary)--\r\n")
         return body
+    }
+    
+    private func createBody(with parameters: [String: String]?,
+                           files: [(name:String, path:String)],
+                           boundary: String) throws -> Data {
+       var body = Data()
+        
+       //添加普通参数数据
+       if parameters != nil {
+           for (key, value) in parameters! {
+               // 数据之前要用 --分隔线 来隔开 ，否则后台会解析失败
+               body.append("--\(boundary)\r\n")
+               body.append("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n")
+               body.append("\(value)\r\n")
+           }
+       }
+        
+       //添加文件数据
+       for file in files {
+           let url = URL(fileURLWithPath: file.path)
+           let filename = url.lastPathComponent
+           let data = try Data(contentsOf: url)
+           let mimetype = mimeType(pathExtension: url.pathExtension)
+            
+           // 数据之前要用 --分隔线 来隔开 ，否则后台会解析失败
+           body.append("--\(boundary)\r\n")
+           body.append("Content-Disposition: form-data; "
+               + "name=\"\(file.name)\"; filename=\"\(filename)\"\r\n")
+           body.append("Content-Type: \(mimetype)\r\n\r\n") //文件类型
+           body.append(data) //文件主体
+           body.append("\r\n") //使用\r\n来表示这个这个值的结束符
+       }
+        
+       // --分隔线-- 为整个表单的结束符
+       body.append("--\(boundary)--\r\n")
+       return body
+   }
+    
+    //根据后缀获取对应的Mime-Type
+    private func mimeType(pathExtension: String) -> String {
+        if let uti = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension,
+                                                           pathExtension as NSString,
+                                                           nil)?.takeRetainedValue() {
+            if let mimetype = UTTypeCopyPreferredTagWithClass(uti, kUTTagClassMIMEType)?
+                .takeRetainedValue() {
+                return mimetype as String
+            }
+        }
+        //文件资源类型如果不知道，传万能类型application/octet-stream，服务器会自动解析文件类
+        return "application/octet-stream"
     }
     
     private func dataTask<T:Codable>(request:URLRequest,completion:@escaping completion<T>){
