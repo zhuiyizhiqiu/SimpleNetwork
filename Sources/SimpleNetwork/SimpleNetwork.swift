@@ -9,7 +9,6 @@ open class SimpleNetwork {
     
     static let conf = URLSessionConfiguration.default
     let session = URLSession(configuration: conf)
-//    typealias T = Codable
     public typealias completion<T:Codable> =  (ResponseResult,T?) -> ()
 //    typealias completion = (ResponseResult,JSON?) -> ()
     
